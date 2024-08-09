@@ -7,12 +7,12 @@ from collections import defaultdict
 # relative to the script’s directory, not the current working directory.
 script_dir = os.path.dirname(os.path.abspath(__file__))
 
-with open(os.path.join(script_dir, '..','data', 'mbi_list.txt'),'r',encoding='utf8') as file:
+with open(os.path.join(script_dir, 'data', 'mbi_list.txt'),'r',encoding='utf8') as file:
     verblist_all = [v.strip() for v in file]
 
 # read in the 新满汉_POStag
 pos_default_dict = defaultdict(str)
-with open(os.path.join(script_dir, '..','data', '新满汉_POStag.txt'),'r',encoding='utf8') as file:
+with open(os.path.join(script_dir,'data', '新满汉_POStag.txt'),'r',encoding='utf8') as file:
     for line in file:
         w,pos = line.strip().split('\t')
         pos_default_dict[w] = pos
