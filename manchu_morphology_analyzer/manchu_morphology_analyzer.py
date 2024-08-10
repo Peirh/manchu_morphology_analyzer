@@ -44,7 +44,8 @@ def verb_stemmer(word):
 def noun_stemmer(word):
     # Define the suffixes you want to remove
     suffixes = ['be','de', 'ci','i',
-                'ngga','ngge','nggo']
+                'ngga','ngge','nggo',
+                'sa','se','so']
     
     # Create a pattern that matches any of the suffixes
     pattern = r'(' + '|'.join(suffixes) + r')$'
@@ -79,10 +80,18 @@ def split_noun_in_text(text):
     for token in tokens:
         token = token.strip()
         from_inflected = noun_stemmer(token).replace('~','')
+        # if the root noun is in dict and the inflected noun is not in dict
         if from_inflected in pos_default_dict.keys() and token not in pos_default_dict.keys():
             if '方' in pos_default_dict[from_inflected] or '名' in pos_default_dict[from_inflected]: # if the token is in the dictionary, and is a noun or 方位词, then split
                 stem = noun_stemmer(token).replace('~','')
                 new_list.append(token.replace(stem,f'{stem}~'))
+            else:
+                new_list.append(token)
+        # if the root is not in dict, but root+n is in dict. limited to a few suffices
+        elif from_inflected not in pos_default_dict.keys() and from_inflected + 'n' in pos_default_dict.keys() and token.endswith(('ci','ngga','ngge','nggo','sa','se','so')): 
+            if '方' in pos_default_dict[from_inflected +'n'] or '名' in pos_default_dict[from_inflected +'n'] or '数' in pos_default_dict[from_inflected]:
+                stem = noun_stemmer(token).replace('~','')
+                new_list.append(token.replace(stem,f'{stem}n~'))# nikasa -> nikan~sa, fujurungga -> fujurun~ngga
             else:
                 new_list.append(token)
         else:
