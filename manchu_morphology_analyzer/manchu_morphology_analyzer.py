@@ -89,27 +89,30 @@ def split_noun_in_text(text):
     new_list = []
     for token in tokens:
         token = token.strip()
-        from_inflected = noun_stemmer(token).replace('~','')
-        # if the root noun is in dict and the inflected noun is not in dict
-        if from_inflected in pos_default_dict.keys() and token not in pos_default_dict.keys():
-            if '方' in pos_default_dict[from_inflected] or '名' in pos_default_dict[from_inflected]: # if the token is in the dictionary, and is a noun or 方位词, then split
-                stem = noun_stemmer(token).replace('~','')
-                new_list.append(token.replace(stem,f'{stem}~'))
-            else:
-                new_list.append(token)
-        # if the token is a irregular form
-        elif token in irregular_wordlist.keys():
-            if '~' in irregular_wordlist[token]: # if it is a irregular noun
+        # if the token is not directly in dict
+        if token not in pos_default_dict.keys():
+            # if the token is irregular, then just split according to irregular list
+            if token in irregular_wordlist.keys() and '~' in irregular_wordlist[token]:# if it is a irregular noun (with ~)
                 new_list.append(irregular_wordlist[token])
             else:
-                new_list.append(token)
-        # if the root is not in dict, but root+n is in dict. limited to a few suffices
-        elif from_inflected not in pos_default_dict.keys() and from_inflected + 'n' in pos_default_dict.keys() and token.endswith(('ci','ngga','ngge','nggo','sa','se','so')): 
-            if '方' in pos_default_dict[from_inflected +'n'] or '名' in pos_default_dict[from_inflected +'n'] or '数' in pos_default_dict[from_inflected]:
-                stem = noun_stemmer(token).replace('~','')
-                new_list.append(token.replace(stem,f'{stem}n~'))# nikasa -> nikan~sa, fujurungga -> fujurun~ngga
-            else:
-                new_list.append(token)
+                # get the dict form
+                from_inflected = noun_stemmer(token).replace('~','')
+                # the the reconstructed dict form is in dict
+                if from_inflected in pos_default_dict.keys():
+                    if '方' in pos_default_dict[from_inflected] or '名' in pos_default_dict[from_inflected]: # if it is a noun or 方位词, then split
+                        stem = noun_stemmer(token).replace('~','')
+                        new_list.append(token.replace(stem,f'{stem}~'))
+                    else:
+                        new_list.append(token)
+                # if the root is not in dict, but root+n is in dict. limited to a few suffices
+                elif from_inflected + 'n' in pos_default_dict.keys() and token.endswith(('ci','ngga','ngge','nggo','sa','se','so')): 
+                    if '方' in pos_default_dict[from_inflected +'n'] or '名' in pos_default_dict[from_inflected +'n'] or '数' in pos_default_dict[from_inflected]:
+                        stem = noun_stemmer(token).replace('~','')
+                        new_list.append(token.replace(stem,f'{stem}n~'))# nikasa -> nikan~sa, fujurungga -> fujurun~ngga
+                    else:
+                        new_list.append(token)
+                else:
+                    new_list.append(token)
         else:
             new_list.append(token)
     return ' '.join(new_list)
