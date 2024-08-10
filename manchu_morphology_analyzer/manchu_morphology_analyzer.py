@@ -17,23 +17,30 @@ with open(os.path.join(script_dir,'data', '新满汉_POStag.txt'),'r',encoding='
         w,pos = line.strip().split('\t')
         pos_default_dict[w] = pos
 
-def verb_stemmer(word):
+## irregular nouns and verbs
+irregular_wordlist = dict()
+with open(os.path.join(script_dir,'data', '新满汉_irregular_verbs_and_nouns.txt'),'r',encoding='utf8') as file:
+    for line in file:
+        form, split = line.strip().split('\t')
+        irregular_wordlist[form] = split
+
+def regular_verb_stemmer(word):
     # Define the suffixes you want to remove
     suffixes = ['mbi','me', 'ci','ki','kini','mbihe','mbime','mbifi','cibe','cina',
-                'fi', 'pi','mpi',
+                'fi', 
                 'nggala','nggele','nggolo',
                 'tai','tei','toi',
                 'tala','tele','tolo',
-                'ra','re','ro','ndara','ndere',
+                'ra','re','ro',
                 'rakv','rekv',
-                'rangge','rengge','rongge','ndarangge','nderengge',
-                'ha','he','ho','ka','ke','ko','ngka','ngke','ngko',
+                'rangge','rengge','rongge',
+                'ha','he','ho',
                 'hai','hei','hoi',
                 'hakv','hekv',
-                'hangge','hengge','hongge','kangge','kengge','kongge','ngkangge','ngkengge','ngkongge',
-                'habi','hebi','hobi','kabi','kebi','kobi',
-                'habihe','hebihe','hobihe','kabihe','kebihe','kobihe',
-                'habici','hebici','hobici','kabici','kebici','kobici']
+                'hangge','hengge','hongge',
+                'habi','hebi','hobi',
+                'habihe','hebihe','hobihe',
+                'habici','hebici','hobici']
     
     # Create a pattern that matches any of the suffixes
     pattern = r'(' + '|'.join(suffixes) + r')$'
@@ -59,16 +66,19 @@ def split_verb_in_text(text):
     for token in tokens:
         #from_imperative = token + 'mbi'
         token = token.strip()
-        from_conjugated = verb_stemmer(token).replace('=','mbi')
-        if token in verblist_all:
-            new_list.append(token.replace('mbi','=mbi'))
-        elif token in pos_default_dict.keys():
-        #if token in pos_dict.keys() and '及' not in ' '.join(pos_default_dict[token]): # if the token is in the dictionary, and is not a verb, dont split
-            new_list.append(token)
-        elif from_conjugated in verblist_all:
-        #elif '及' in ' '.join(pos_default_dict[from_conjugated]): # if the reconstructed dictionary form is in the dictionary and is a verb, split the verb
-            # or '及' in ' '.join(pos_default_dict[from_imperative])
-            stem = verb_stemmer(token).replace('=','')
+        from_conjugated_regular = regular_verb_stemmer(token).replace('=','mbi')
+        if token in pos_default_dict.keys(): # if the token is in 新满汉dict
+            if token in verblist_all: # if the token is -mbi verb
+                new_list.append(token.replace('mbi','=mbi'))
+            else:
+                new_list.append(token)
+        elif token in irregular_wordlist.keys(): # if the token is a irregular form
+            if '=' in irregular_wordlist[token]: # if it is a irregular verb
+                new_list.append(irregular_wordlist[token])
+            else:
+                new_list.append(token)
+        elif from_conjugated_regular in verblist_all: # when the token is not in 新满汉dict, and is a (regular) verb  
+            stem = regular_verb_stemmer(token).replace('=','')
             new_list.append(token.replace(stem,f'{stem}='))
         else:
             new_list.append(token)
@@ -85,6 +95,12 @@ def split_noun_in_text(text):
             if '方' in pos_default_dict[from_inflected] or '名' in pos_default_dict[from_inflected]: # if the token is in the dictionary, and is a noun or 方位词, then split
                 stem = noun_stemmer(token).replace('~','')
                 new_list.append(token.replace(stem,f'{stem}~'))
+            else:
+                new_list.append(token)
+        # if the token is a irregular form
+        elif token in irregular_wordlist.keys():
+            if '~' in irregular_wordlist[token]: # if it is a irregular noun
+                new_list.append(irregular_wordlist[token])
             else:
                 new_list.append(token)
         # if the root is not in dict, but root+n is in dict. limited to a few suffices
