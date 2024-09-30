@@ -25,7 +25,7 @@ with open(os.path.join(script_dir,'data', '新满汉_irregular_verbs_and_nouns.t
         irregular_wordlist[form] = split
 
 def regular_verb_stemmer(word):
-    # Define the suffixes you want to remove
+    # suffixes for regular verbs that we want to remove
     suffixes = ['mbi','me', 'ci','ki','kini','mbihe','mbime','mbifi','cibe','cina',
                 'fi', 
                 'nggala','nggele','nggolo',
@@ -69,7 +69,8 @@ def split_verb_in_text(text):
         from_conjugated_regular = regular_verb_stemmer(token).replace('=','mbi')
         if token in pos_default_dict.keys(): # if the token is in 新满汉dict
             if token in verblist_all: # if the token is -mbi verb
-                new_list.append(token.replace('mbi','=mbi'))
+                token = re.sub(f'mbi$', '=mbi', token)
+                new_list.append(token)
             else:
                 new_list.append(token)
         elif token in irregular_wordlist.keys(): # if the token is a irregular form
