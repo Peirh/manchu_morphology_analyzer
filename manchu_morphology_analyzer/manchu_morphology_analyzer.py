@@ -67,7 +67,7 @@ def split_verb_in_text(text):
         #from_imperative = token + 'mbi'
         token = token.strip()
         from_conjugated_regular = regular_verb_stemmer(token).replace('=','mbi')
-        if token in pos_default_dict.keys(): # if the token is in 新满汉dict
+        if token in pos_default_dict.keys(): # if the token is already in 新满汉dict, then do not split it
             if token in verblist_all: # if the token is -mbi verb
                 token = re.sub(f'mbi$', '=mbi', token)
                 new_list.append(token)
