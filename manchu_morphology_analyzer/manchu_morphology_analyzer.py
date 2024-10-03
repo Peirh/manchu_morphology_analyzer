@@ -24,7 +24,7 @@ with open(os.path.join(script_dir,'data', '新满汉_irregular_verbs_and_nouns.t
         form, split = line.strip().split('\t')
         irregular_wordlist[form] = split
 
-def regular_verb_stemmer(word):
+def regular_verb_split_inflection(word):
     # suffixes for regular verbs that we want to remove
     suffixes = ['mbi','me', 'ci','ki','kini','mbihe','mbime','mbifi','cibe','cina',
                 'fi', 
@@ -42,13 +42,12 @@ def regular_verb_stemmer(word):
                 'habihe','hebihe','hobihe',
                 'habici','hebici','hobici']
     
-    # Create a pattern that matches any of the suffixes
-    pattern = r'(' + '|'.join(suffixes) + r')$'
-    
-    # Use re.sub() to replace the suffix with =
-    return re.sub(pattern, '=', word)
+    pattern = r'(' + '|'.join(suffixes) + r')$'# Create a pattern that matches any of the suffixes
+    new_word = re.sub(pattern, r'=\1', word) # \1 refers to the matched suffix
 
-def noun_stemmer(word):
+    return new_word
+
+def noun_split(word):
     # Define the suffixes you want to remove
     suffixes = ['be','de', 'ci','i',
                 'ngga','ngge','nggo',
@@ -57,30 +56,32 @@ def noun_stemmer(word):
     # Create a pattern that matches any of the suffixes
     pattern = r'(' + '|'.join(suffixes) + r')$'
     
-    # Use re.sub() to replace the suffix with =
-    return re.sub(pattern, '~', word)
+    new_word = re.sub(pattern, r'~\1', word) # \1 refers to the matched suffix
+    return new_word
 
-def split_verb_in_text(text):
+def split_verb_in_text(text, split_derivational = False):
     tokens = text.split()
     new_list = []
     for token in tokens:
         #from_imperative = token + 'mbi'
         token = token.strip()
-        from_conjugated_regular = regular_verb_stemmer(token).replace('=','mbi')
-        if token in pos_default_dict.keys(): # if the token is already in 新满汉dict, then do not split it
+        from_conjugated_regular = re.sub('=.+$','mbi',regular_verb_split_inflection(token))
+        # if the token is already in 新满汉dict, keep the token
+        if token in pos_default_dict.keys(): 
             if token in verblist_all: # if the token is -mbi verb
-                token = re.sub(f'mbi$', '=mbi', token)
-                new_list.append(token)
+                new_list.append(re.sub('mbi$','=mbi',token))
             else:
                 new_list.append(token)
-        elif token in irregular_wordlist.keys(): # if the token is a irregular form
+        # if the token is a irregular form, split the token according to irregular verb list
+        elif token in irregular_wordlist.keys(): 
             if '=' in irregular_wordlist[token]: # if it is a irregular verb
                 new_list.append(irregular_wordlist[token])
             else:
                 new_list.append(token)
-        elif from_conjugated_regular in verblist_all: # when the token is not in 新满汉dict, and is a (regular) verb  
-            stem = regular_verb_stemmer(token).replace('=','')
-            new_list.append(token.replace(stem,f'{stem}='))
+        # when the token is not in 新满汉dict, and is a (regular) verb, replace the stem with 'stem='
+        elif from_conjugated_regular in verblist_all:
+            splitted = regular_verb_split_inflection(token)
+            new_list.append(splitted)
         else:
             new_list.append(token)
     return ' '.join(new_list)
@@ -97,19 +98,17 @@ def split_noun_in_text(text):
                 new_list.append(irregular_wordlist[token])
             else:
                 # get the dict form
-                from_inflected = noun_stemmer(token).replace('~','')
+                from_inflected = re.sub('~.+$','',noun_split(token))
                 # the the reconstructed dict form is in dict
                 if from_inflected in pos_default_dict.keys():
                     if '方' in pos_default_dict[from_inflected] or '名' in pos_default_dict[from_inflected]: # if it is a noun or 方位词, then split
-                        stem = noun_stemmer(token).replace('~','')
-                        new_list.append(token.replace(stem,f'{stem}~'))
+                        new_list.append(noun_split(token))
                     else:
                         new_list.append(token)
                 # if the root is not in dict, but root+n is in dict. limited to a few suffices
                 elif from_inflected + 'n' in pos_default_dict.keys() and token.endswith(('ci','ngga','ngge','nggo','sa','se','so')): 
                     if '方' in pos_default_dict[from_inflected +'n'] or '名' in pos_default_dict[from_inflected +'n'] or '数' in pos_default_dict[from_inflected]:
-                        stem = noun_stemmer(token).replace('~','')
-                        new_list.append(token.replace(stem,f'{stem}n~'))# nikasa -> nikan~sa, fujurungga -> fujurun~ngga
+                        new_list.append(noun_split(token).replace('~','n~'))# nika~sa -> nikan~sa, fujuru~ngga -> fujurun~ngga
                     else:
                         new_list.append(token)
                 else:
