@@ -5,13 +5,17 @@ Note that 新满汉大辞典 only includes non-inflected word forms in its dicti
 Therefore, when encountering ambiguity (e.g. sere, oho), the morpheme splitter will not split. And when the token is out of the vocabulary, it will not split.
 
 # install
+```python
 pip install --upgrade git+https://github.com/Peirh/manchu_morphology_analyzer.git
+```
 
 # usage
+```python
 from manchu_morphology_analyzer import manchu_morphology_analyzer
-
 manchu_morphology_analyzer.noun_verb_splitter('manjui mafari i adali, muse sasa gabtambi')
+```
 
 If you want to split derivational suffixes, set split_derivational = True:
-
+```python
 manchu_morphology_analyzer.noun_verb_splitter('kadalara hafan elik sandari semin no cy uthai acanjimbi',split_derivational = True)
+```
