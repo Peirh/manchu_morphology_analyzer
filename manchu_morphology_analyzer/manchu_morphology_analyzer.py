@@ -24,6 +24,27 @@ with open(os.path.join(script_dir,'data', '新满汉_irregular_verbs_and_nouns.t
         form, split = line.strip().split('\t')
         irregular_wordlist[form] = split
 
+## get a manchu to mongol dict from 五体清文鉴
+mnc2mgl_all_dict = defaultdict(set)
+with open(r'C:\Users\haral\Desktop\my_own_projects\my_ipynb\scraping\dynamic\栗林均\dict五体清文鉴\五体清文鉴(满汉蒙).txt','r',encoding='utf8') as file:
+    lines = file.readlines()
+# generated from all entries of 五体清文鉴
+for line in lines:
+    id, mnc, nikan, mgl= line.split('\t')
+    mgl = mgl.replace('\n','')
+    mnc = re.sub('\[.*\]', '', mnc)
+    mnc = re.sub('mbi$', '=', mnc)
+    mnc = mnc.replace('š','x').replace('ū','v')
+    mgl = re.sub('\[.*\]', '', mgl)
+    mgl = mgl.replace('=mui','=').replace('=müi','=').replace('=ü','').replace('=u','').replace('_','').replace('D','d')
+    mgl = mgl.replace('\'','').replace('?','')
+    if ',' in mgl:
+        mgl_splits = mgl.split(',')
+        for mgl_split in mgl_splits:
+            mnc2mgl_all_dict[mnc].add(mgl_split.strip())
+    else:
+        mnc2mgl_all_dict[mnc].add(mgl)
+
 def regular_verb_split_inflection(word):
     # suffixes for regular verbs that we want to remove
     suffixes = ['mbi','me', 'ci','ki','kini','mbihe','mbime','mbifi','cibe','cina',
@@ -59,7 +80,34 @@ def noun_split(word):
     new_word = re.sub(pattern, r'~\1', word) # \1 refers to the matched suffix
     return new_word
 
-def split_verb_in_text(text):
+# a function for splitting derivational suffixes
+def split_derivation_in_verbal_stem(word):
+    derivational_stem = re.sub('=.*$','',word)
+    #print(derivational_stem)
+    new_word = word
+    # causative/passive
+    if derivational_stem.endswith(('mbu', 'bu')):
+        for mgl in mnc2mgl_all_dict[derivational_stem+'=']:
+            if mgl.endswith(('ge=','γa=','ke=','qa=','γul=','gül=','γda=','gde=')):
+                new_word = re.sub('(bu=|mbu=|bu$|mbu$)', r'+\1', word) # \1 refers to the matched suffix
+    # cooperative, reciprocal
+    elif derivational_stem.endswith(('nu', 'ndu')):
+        for mgl in mnc2mgl_all_dict[derivational_stem+'=']:
+            if mgl.endswith(('ldü=','ldu=','lca=','lce=')):
+                new_word = re.sub('(nu=|ndu=|nu$|ndu$)', r'+\1', word) # \1 refers to the matched suffix
+    # to come to..
+    elif derivational_stem.endswith('nji'):
+        for mgl in mnc2mgl_all_dict[derivational_stem+'=']:
+            if mgl.endswith('ire='):
+                new_word = re.sub('(nji=|nji$)', r'+\1', word) # \1 refers to the matched suffix
+    # to go to..
+    elif derivational_stem.endswith(('na','ne','no')):
+        for mgl in mnc2mgl_all_dict[derivational_stem+'=']:
+            if mgl.endswith('od='):
+                new_word = re.sub('(na=|ne=|no=|na$|ne$|no$)', r'+\1', word) # \1 refers to the matched suffix
+    return new_word
+
+def split_verb_in_text(text, split_derivational=False):
     tokens = text.split()
     new_list = []
     for token in tokens:
@@ -84,7 +132,13 @@ def split_verb_in_text(text):
             new_list.append(splitted)
         else:
             new_list.append(token)
-    return ' '.join(new_list)
+    
+    # optional: can also split the derivational suffixes
+    if split_derivational == True:
+        new_list_derivaition = [split_derivation_in_verbal_stem(token) for token in new_list]
+        return ' '.join(new_list_derivaition)
+    else:
+        return ' '.join(new_list)
 
 def split_noun_in_text(text):
     tokens = text.split()
@@ -118,4 +172,4 @@ def split_noun_in_text(text):
     return ' '.join(new_list)
 
 def noun_verb_splitter(text):
-    return split_noun_in_text(split_verb_in_text(text))
+    return split_noun_in_text(split_verb_in_text(text,split_derivational=False))
