@@ -59,7 +59,7 @@ def noun_split(word):
     new_word = re.sub(pattern, r'~\1', word) # \1 refers to the matched suffix
     return new_word
 
-def split_verb_in_text(text, split_derivational = False):
+def split_verb_in_text(text):
     tokens = text.split()
     new_list = []
     for token in tokens:

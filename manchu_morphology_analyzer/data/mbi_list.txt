@@ -140,9 +140,7 @@ akvmbi
 akvmbumbi
 akvnambi
 akvnjimbi
-akxalambi
 akxambi
-akxambumbi
 akxantambi
 akxulabumbi
 akxulambi
@@ -1521,6 +1519,7 @@ ergenumbi
 ergexembi
 ergilembi
 erguwembi
+erhelembi
 erhembi
 erhunjembi
 eribumbi
@@ -1788,6 +1787,7 @@ firgembumbi
 firgendembi
 firubumbi
 firumbi
+firundumbi
 fisekulembi
 fisembi
 fisembumbi
@@ -2096,6 +2096,7 @@ galambi
 galgibumbi
 galgimbi
 galimbi
+galirambi
 galjurambi
 gamabumbi
 gamambi
@@ -2249,6 +2250,7 @@ gilmarjambi
 gilmarlambi
 gilmerjembi
 giltarilambi
+giltarjambi
 giltarxambi
 gincihinembi
 ginggambi
@@ -3936,7 +3938,6 @@ liyeliyendumbi
 liyeliyenumbi
 liyeliyexembi
 liyoogulambi
-lmohombi
 lohobumbi
 loksanambi
 loksimbi
