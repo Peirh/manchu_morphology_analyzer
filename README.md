@@ -11,3 +11,7 @@ pip install --upgrade git+https://github.com/Peirh/manchu_morphology_analyzer.gi
 from manchu_morphology_analyzer import manchu_morphology_analyzer
 
 manchu_morphology_analyzer.noun_verb_splitter('manjui mafari i adali, muse sasa gabtambi')
+
+If you want to split derivational suffixes, set split_derivational = True:
+
+manchu_morphology_analyzer.noun_verb_splitter('kadalara hafan elik sandari semin no cy uthai acanjimbi',split_derivational = True)
