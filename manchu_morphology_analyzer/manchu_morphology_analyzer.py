@@ -172,4 +172,4 @@ def split_noun_in_text(text):
     return ' '.join(new_list)
 
 def noun_verb_splitter(text,split_derivational = False):
-    return split_noun_in_text(split_verb_in_text(text,split_derivational = False))
+    return split_noun_in_text(split_verb_in_text(text,split_derivational))
