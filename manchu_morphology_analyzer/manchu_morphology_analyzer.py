@@ -81,7 +81,7 @@ def noun_split(word):
     return new_word
 
 # a function for splitting derivational suffixes
-def split_derivation_in_verbal_stem(word):
+def split_derivational_suffix(word):
     derivational_stem = re.sub('=.*$','',word)
     #print(derivational_stem)
     new_word = word
@@ -107,7 +107,7 @@ def split_derivation_in_verbal_stem(word):
                 new_word = re.sub('(na=|ne=|no=|na$|ne$|no$)', r'+\1', word) # \1 refers to the matched suffix
     return new_word
 
-def split_verb_in_text(text, split_derivational=False):
+def split_verb_in_text(text):
     tokens = text.split()
     new_list = []
     for token in tokens:
@@ -132,13 +132,7 @@ def split_verb_in_text(text, split_derivational=False):
             new_list.append(splitted)
         else:
             new_list.append(token)
-    
-    # optional: can also split the derivational suffixes
-    if split_derivational == True:
-        new_list_derivaition = [split_derivation_in_verbal_stem(token) for token in new_list]
-        return ' '.join(new_list_derivaition)
-    else:
-        return ' '.join(new_list)
+    return ' '.join(new_list)
 
 def split_noun_in_text(text):
     tokens = text.split()
@@ -172,4 +166,10 @@ def split_noun_in_text(text):
     return ' '.join(new_list)
 
 def noun_verb_splitter(text,split_derivational = False):
-    return split_noun_in_text(split_verb_in_text(text,split_derivational))
+    inflection_splitted_text = split_noun_in_text(split_verb_in_text(text))
+    # optional: can also split the derivational suffixes
+    if split_derivational == True:
+        new_list_derivaition = [split_derivational_suffix(token) for token in inflection_splitted_text.split(' ')]
+        return ' '.join(new_list_derivaition)
+    else:
+        return inflection_splitted_text
