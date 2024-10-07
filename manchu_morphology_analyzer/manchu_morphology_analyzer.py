@@ -81,8 +81,9 @@ def noun_split(word):
     return new_word
 
 # a function for splitting derivational suffixes
+# currently only can only split one suffix, cannot split recursively
 def split_derivational_suffix(word):
-    derivational_stem = re.sub('=.*$','',word)
+    derivational_stem = re.sub('[=+].*$','',word)
     #print(derivational_stem)
     new_word = word
     # causative/passive
@@ -105,6 +106,11 @@ def split_derivational_suffix(word):
         for mgl in mnc2mgl_all_dict[derivational_stem+'=']:
             if mgl.endswith('od='):
                 new_word = re.sub('(na=|ne=|no=|na$|ne$|no$)', r'+\1', word) # \1 refers to the matched suffix
+    # noun + la -> verb
+    elif derivational_stem.endswith(('la','le','lo')):
+        for mgl in mnc2mgl_all_dict[derivational_stem+'=']:
+            if mgl.endswith(('la=','le=','lo=')):
+                new_word = re.sub('(la=|le=|lo=|la$|le$|lo$)', r'+\1', word) # \1 refers to the matched suffix
     return new_word
 
 def split_verb_in_text(text):
