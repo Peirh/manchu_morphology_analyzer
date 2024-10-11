@@ -111,6 +111,11 @@ def split_derivational_suffix(word):
         for mgl in mnc2mgl_all_dict[derivational_stem+'=']:
             if mgl.endswith(('la=','le=','lo=')):
                 new_word = re.sub('(la=|le=|lo=|la$|le$|lo$)', r'+\1', word) # \1 refers to the matched suffix
+    # noun/adjective + kan/ken/kon  -> diminutive
+    elif derivational_stem.endswith(('kan','ken','kon')):
+        for mgl in mnc2mgl_all_dict[derivational_stem+'=']:
+            if mgl.endswith(('qan=','ken=')):
+                new_word = re.sub('(qan=|ken=|qan$|ken$)', r'+\1', word) # \1 refers to the matched suffix
     return new_word
 
 def split_verb_in_text(text):
