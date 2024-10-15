@@ -26,28 +26,27 @@ with open(os.path.join(script_dir,'data', '新满汉_irregular_verbs_and_nouns.t
 
 ## get a manchu to mongol dict from 五体清文鉴
 mnc2mgl_all_dict = defaultdict(set)
-with open(r'C:\Users\haral\Desktop\my_own_projects\my_ipynb\scraping\dynamic\栗林均\dict五体清文鉴\五体清文鉴(满汉蒙).txt','r',encoding='utf8') as file:
-    lines = file.readlines()
-# generated from all entries of 五体清文鉴
-for line in lines:
-    id, mnc, nikan, mgl= line.split('\t')
-    mgl = mgl.replace('\n','')
-    mnc = re.sub('\[.*\]', '', mnc)
-    mnc = re.sub('mbi$', '=', mnc)
-    mnc = mnc.replace('š','x').replace('ū','v')
-    mgl = re.sub('\[.*\]', '', mgl)
-    mgl = mgl.replace('=mui','=').replace('=müi','=').replace('=ü','').replace('=u','').replace('_','').replace('D','d')
-    mgl = mgl.replace('\'','').replace('?','')
-    if ',' in mgl:
-        mgl_splits = mgl.split(',')
-        for mgl_split in mgl_splits:
-            mnc2mgl_all_dict[mnc].add(mgl_split.strip())
-    else:
-        mnc2mgl_all_dict[mnc].add(mgl)
+with open(os.path.join(script_dir,'data', '五体清文鉴(满汉蒙).txt'),'r',encoding='utf8') as file:
+    for line in file:
+        id, mnc, nikan, mgl= line.strip().split('\t')
+        mnc = mnc.strip()
+        mnc = re.sub('\[.*\]', '', mnc)
+        mnc = re.sub('mbi$', '=', mnc)
+        mnc = mnc.replace('š','x').replace('ū','v')
+        mgl = mgl.strip()
+        mgl = re.sub('\[.*\]', '', mgl)
+        mgl = mgl.replace('=mui','=').replace('=müi','=').replace('=ü','').replace('=u','').replace('_','').replace('D','d')
+        mgl = mgl.replace('\'','').replace('?','')
+        if ',' in mgl:
+            mgl_splits = mgl.split(',')
+            for mgl_split in mgl_splits:
+                mnc2mgl_all_dict[mnc].add(mgl_split.strip())
+        else:
+            mnc2mgl_all_dict[mnc].add(mgl)
 
 def regular_verb_split_inflection(word):
     # suffixes for regular verbs that we want to remove
-    suffixes = ['mbi','me', 'ci','ki','kini','mbihe','mbime','mbifi','cibe','cina',
+    suffixes = ('mbi','me','ci','ki','kini','mbihe','mbime','mbifi','cibe','cina',
                 'fi', 
                 'nggala','nggele','nggolo',
                 'tai','tei','toi',
@@ -61,12 +60,18 @@ def regular_verb_split_inflection(word):
                 'hangge','hengge','hongge',
                 'habi','hebi','hobi',
                 'habihe','hebihe','hobihe',
-                'habici','hebici','hobici']
+                'habici','hebici','hobici')
+    # Check if 'word' ends with any of the suffixes and has more characters than the suffix
+    if any(word.endswith(suffix) and len(word) > len(suffix) for suffix in suffixes):
+        pattern = r'(' + '|'.join(suffixes) + r')$'# Create a pattern that matches any of the suffixes
+        word = re.sub(pattern, r'=\1', word) # \1 refers to the matched suffix
     
-    pattern = r'(' + '|'.join(suffixes) + r')$'# Create a pattern that matches any of the suffixes
-    new_word = re.sub(pattern, r'=\1', word) # \1 refers to the matched suffix
-
-    return new_word
+    # for imperitive, add =
+    # if mnc word does not ends in =, but all the mgl words in mgl_set ends with =
+    elif not word.endswith('='):
+        if len(mnc2mgl_all_dict[word]) != 0 and all(mgl.endswith("=") for mgl in mnc2mgl_all_dict[word]):
+            word = word + '='
+    return word
 
 def noun_split(word):
     # Define the suffixes you want to remove
