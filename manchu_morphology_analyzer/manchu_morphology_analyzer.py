@@ -46,21 +46,27 @@ with open(os.path.join(script_dir,'data', '五体清文鉴(满汉蒙).txt'),'r',
 
 def regular_verb_split_inflection(word):
     # suffixes for regular verbs that we want to remove
-    suffixes = ('mbi','me','ci','ki','kini','mbihe','mbime','mbifi','cibe','cina',
+    suffixes = ('mbi','me','ci','ki','kini','mbihe','mbime','cibe','cina',
                 'fi', 
                 'nggala','nggele','nggolo',
                 'tai','tei','toi',
                 'tala','tele','tolo',
                 'ra','re','ro',
-                'rakv','rekv',
+                'rai','rei','roi',
+                'rao','reo',
+                'rakv','rekv','rokv',
+                'rahv',
                 'rangge','rengge','rongge',
                 'ha','he','ho',
                 'hai','hei','hoi',
-                'hakv','hekv',
+                'hakv','hekv','hokv',
                 'hangge','hengge','hongge',
                 'habi','hebi','hobi',
                 'habihe','hebihe','hobihe',
-                'habici','hebici','hobici')
+                'habici','hebici','hobici',
+                'hacibe','hecibe','hocibe',
+                'hadari','hedari','hodari',
+                'hala','hele')
     # Check if 'word' ends with any of the suffixes and has more characters than the suffix
     if any(word.endswith(suffix) and len(word) > len(suffix) for suffix in suffixes):
         pattern = r'(' + '|'.join(suffixes) + r')$'# Create a pattern that matches any of the suffixes
@@ -75,7 +81,7 @@ def regular_verb_split_inflection(word):
 
 def noun_split(word):
     # Define the suffixes you want to remove
-    suffixes = ['be','de', 'ci','i',
+    suffixes = ['be','de','deri','ci','i','ni'
                 'ngga','ngge','nggo',
                 'sa','se','so']
     
