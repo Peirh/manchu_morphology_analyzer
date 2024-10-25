@@ -643,7 +643,7 @@ niyangniyaraka	niyangniyara=ka
 niyangniyarakangge	niyangniyara=kangge
 niyangniyarakabi	niyangniyara=kabi
 niyangniyarakabihe	niyangniyara=kabihe
-niyasubika	niyasubi~ka
+niyasuka	niyasubi=ka
 nota	non~ta
 nukcike	nukci=ke
 nukcikengge	nukci=kengge
@@ -789,7 +789,7 @@ ubaliyaka	ubaliya=ka
 ubaliyakangge	ubaliya=kangge
 ubaliyakabi	ubaliya=kabi
 ubaliyakabihe	ubaliya=kabihe
-ubaliyaka	ubaliyan~ka
+ubaliyaka	ubaliyan=ka
 ulaka	ula=ka
 ulakangge	ula=kangge
 ulakabi	ula=kabi
