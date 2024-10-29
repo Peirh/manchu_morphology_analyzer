@@ -133,27 +133,37 @@ def split_verb_in_text(text):
     tokens = text.split()
     new_list = []
     for token in tokens:
+        multiple_possible_analysis = set()
         #from_imperative = token + 'mbi'
         token = token.strip()
         from_conjugated_regular = re.sub('=.+$','mbi',regular_verb_split_inflection(token))
+        # Initialize a flag to track if any condition was satisfied
+        condition_met = False
         # if the token is already in 新满汉dict, keep the token
         if token in pos_default_dict.keys(): 
+            condition_met = True
             if token in verblist_all: # if the token is -mbi verb
-                new_list.append(re.sub('mbi$','=mbi',token))
+                multiple_possible_analysis.add(re.sub('mbi$','=mbi',token))
             else:
-                new_list.append(token)
+                multiple_possible_analysis.add(token)
         # if the token is a irregular form, split the token according to irregular verb list
-        elif token in irregular_wordlist.keys(): 
+        if token in irregular_wordlist.keys():
+            condition_met = True
             if '=' in irregular_wordlist[token]: # if it is a irregular verb
-                new_list.append(irregular_wordlist[token])
+                multiple_possible_analysis.add(irregular_wordlist[token])
             else:
-                new_list.append(token)
+                multiple_possible_analysis.add(token)
         # when the token is not in 新满汉dict, and is a (regular) verb, replace the stem with 'stem='
-        elif from_conjugated_regular in verblist_all:
+        if from_conjugated_regular in verblist_all:
+            condition_met = True
             splitted = regular_verb_split_inflection(token)
-            new_list.append(splitted)
-        else:
-            new_list.append(token)
+            multiple_possible_analysis.add(splitted)
+        # if all the previous ifs are not met, keep the token in its original form
+        if not condition_met:
+            multiple_possible_analysis.add(token)
+
+        analyzed_token = r'/'.join(multiple_possible_analysis)
+        new_list.append(analyzed_token)
     return ' '.join(new_list)
 
 def split_noun_in_text(text):
