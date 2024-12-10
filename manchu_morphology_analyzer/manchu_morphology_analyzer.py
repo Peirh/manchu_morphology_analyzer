@@ -83,7 +83,8 @@ def noun_split(word):
     # Define the suffixes you want to remove
     suffixes = ['be','de','deri','ci','i','ni'
                 'ngga','ngge','nggo',
-                'sa','se','so']
+                'sa','se','so',
+                'o']
     
     # Create a pattern that matches any of the suffixes
     pattern = r'(' + '|'.join(suffixes) + r')$'
