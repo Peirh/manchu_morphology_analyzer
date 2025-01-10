@@ -81,7 +81,7 @@ def regular_verb_split_inflection(word):
 
 def noun_split(word):
     # Define the suffixes you want to remove
-    suffixes = ['be','de','deri','ci','i','ni'
+    suffixes = ['be','de','deri','ci','i','ni',
                 'ngga','ngge','nggo',
                 'sa','se','so',
                 'o']
