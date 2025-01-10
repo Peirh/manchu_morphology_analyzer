@@ -3,7 +3,8 @@ A simple rule-based morphological analyzer/morpheme splitter for Manchu. It can 
 
 The analyzer first test if a token is already included in dictionary entries of 新满汉大辞典, if so, it will not split. Otherwise, it will try to split the token into stem and suffixes, making sure that the stem can be found in the dictionary 新满汉大辞典.
 Note that 新满汉大辞典 only includes non-inflected word forms in its dictionary entries.
-Therefore, when encountering ambiguity (e.g. sere, oho), the morpheme splitter will not split. And when the token is out of the vocabulary, it will not split.
+When encountering ambiguity (e.g. sere, oho), the morpheme splitter will output all possible analyses. 
+When the token is out of the vocabulary, it will not split.
 
 Optionally, it can also split derivational suffixes. The splitting of derivational suffixes is based on morpheme comparison between Manchu and Mongol entries in 五体清文鉴.
 
