@@ -205,3 +205,10 @@ def noun_verb_splitter(text,split_derivational = False):
         return ' '.join(new_list_derivaition)
     else:
         return inflection_splitted_text
+    
+def lemmatizer(word):
+    analyzed = noun_verb_splitter(word)
+    print(analyzed)
+    noun_lemma = re.sub("~([^/]*)?","",analyzed) # lemmatize the noun, if contains nominal suffix
+    noun_verb_lemma = re.sub("=([^/]*)?","mbi",noun_lemma)# lemmatize the verb, if contains nominal verbal suffix
+    return noun_verb_lemma
