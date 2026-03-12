@@ -10,11 +10,10 @@ def convert2buleku_ortho(w):
     """
     #w = re.sub('=$','mbi',w)
     w = w.replace("cg",'gg').replace("ck",'kk').replace("ch",'hh')
-    w = w.replace("g\'",'gg').replace("k\'",'kk').replace("h\'",'hh').replace('c','q')# it seems converting transliteration on the fly can sometimes result in error, so convert them at the beginning before pickle them
-    w = w.replace('dz','Z')
+    w = w.replace("g\'",'gg').replace("k\'",'kk').replace("h\'",'hh')
     w = w.replace('z','r')
     w = w.replace('Z','z')
-    w = w.replace('š','x').replace('ū','v')
+    w = w.replace('š','x').replace('ū','v').replace('c','q')
     return w
 
 # read in the mbi_list
