@@ -2,27 +2,42 @@ import re
 import os
 from collections import defaultdict
 
+
+def convert2buleku_ortho(w):
+    """
+    Because the dictionary data from buleku.org contains some English entries including references to Manchu words, it is difficult to detect and modify these Manchu words embedded in English text.
+    Therefore, all other orthographies should be converted into the same orthography used by buleku.org
+    """
+    #w = re.sub('=$','mbi',w)
+    w = w.replace("cg",'gg').replace("ck",'kk').replace("ch",'hh')
+    w = w.replace("g\'",'gg').replace("k\'",'kk').replace("h\'",'hh').replace('c','q')# it seems converting transliteration on the fly can sometimes result in error, so convert them at the beginning before pickle them
+    w = w.replace('dz','Z')
+    w = w.replace('z','r')
+    w = w.replace('Z','z')
+    w = w.replace('š','x').replace('ū','v')
+    return w
+
 # read in the mbi_list
 # Determine the path relative to this script's directory
 # relative to the script’s directory, not the current working directory.
 script_dir = os.path.dirname(os.path.abspath(__file__))
 
 with open(os.path.join(script_dir, 'data', 'mbi_list.txt'),'r',encoding='utf8') as file:
-    verblist_all = [v.strip() for v in file]
+    verblist_all = [convert2buleku_ortho(v.strip()) for v in file]
 
 # read in the 新满汉_POStag
 pos_default_dict = defaultdict(str)
 with open(os.path.join(script_dir,'data', '新满汉_POStag.txt'),'r',encoding='utf8') as file:
     for line in file:
         w,pos = line.strip().split('\t')
-        pos_default_dict[w] = pos
+        pos_default_dict[convert2buleku_ortho(w)] = pos
 
 ## irregular nouns and verbs
 irregular_wordlist = dict()
 with open(os.path.join(script_dir,'data', '新满汉_irregular_verbs_and_nouns.txt'),'r',encoding='utf8') as file:
     for line in file:
         form, split = line.strip().split('\t')
-        irregular_wordlist[form] = split
+        irregular_wordlist[convert2buleku_ortho(form)] = convert2buleku_ortho(split)
 
 ## get a manchu to mongol dict from 五体清文鉴
 mnc2mgl_all_dict = defaultdict(set)
@@ -33,6 +48,7 @@ with open(os.path.join(script_dir,'data', '五体清文鉴(满汉蒙).txt'),'r',
         mnc = re.sub('\[.*\]', '', mnc)
         mnc = re.sub('mbi$', '=', mnc)
         mnc = mnc.replace('š','x').replace('ū','v')
+        mnc = convert2buleku_ortho(mnc)
         mgl = mgl.strip()
         mgl = re.sub('\[.*\]', '', mgl)
         mgl = mgl.replace('=mui','=').replace('=müi','=').replace('=ü','').replace('=u','').replace('_','').replace('D','d')
@@ -46,7 +62,7 @@ with open(os.path.join(script_dir,'data', '五体清文鉴(满汉蒙).txt'),'r',
 
 def regular_verb_split_inflection(word):
     # suffixes for regular verbs that we want to remove
-    suffixes = ('mbi','me','ci','ki','kini','mbihe','mbime','cibe','cina',
+    suffixes = ('mbi','me','qi','ki','kini','mbihe','mbime','qibe','qina',
                 'fi', 
                 'nggala','nggele','nggolo',
                 'tai','tei','toi',
@@ -63,8 +79,8 @@ def regular_verb_split_inflection(word):
                 'hangge','hengge','hongge',
                 'habi','hebi','hobi',
                 'habihe','hebihe','hobihe',
-                'habici','hebici','hobici',
-                'hacibe','hecibe','hocibe',
+                'habiqi','hebiqi','hobiqi',
+                'haqibe','heqibe','hoqibe',
                 'hadari','hedari','hodari',
                 'hala','hele')
     # Check if 'word' ends with any of the suffixes and has more characters than the suffix
@@ -81,7 +97,7 @@ def regular_verb_split_inflection(word):
 
 def noun_split(word):
     # Define the suffixes you want to remove
-    suffixes = ['be','de','deri','ci','i','ni',
+    suffixes = ['be','de','deri','qi','i','ni',
                 'ngga','ngge','nggo',
                 'sa','se','so'] # ,'o'
     
@@ -186,7 +202,7 @@ def split_noun_in_text(text):
                     else:
                         new_list.append(token)
                 # if the root is not in dict, but root+n is in dict. limited to a few suffices
-                elif from_inflected + 'n' in pos_default_dict.keys() and token.endswith(('ci','ngga','ngge','nggo','sa','se','so')): 
+                elif from_inflected + 'n' in pos_default_dict.keys() and token.endswith(('qi','ngga','ngge','nggo','sa','se','so')): 
                     if '方' in pos_default_dict[from_inflected +'n'] or '名' in pos_default_dict[from_inflected +'n'] or '数' in pos_default_dict[from_inflected]:
                         new_list.append(noun_split(token).replace('~','n~'))# nika~sa -> nikan~sa, fujuru~ngga -> fujurun~ngga
                     else:
